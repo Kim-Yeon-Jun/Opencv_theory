@@ -1,0 +1,72 @@
+부분 행렬 추출
+
+Mat 클래스의 괄호 연산자 재정의 함수 사용
+Mat Mat::operator()(const Rect& roi) const;
+Mat Mat::operator()(Range rowRange, Range colRange) const;
+
+roi : 사각형 형태의 관심 영역 //(Region Of interest)
+rowRange : 관심 행 범위
+colRange : 관심 열 범위
+반환값 : 추출한 부분 행렬 또는 영상. 부분 영상의 픽셀 데이터를 서로 공유함
+
+예제 
+Mat img1 = imread("cat.bmp");
+Mat img2 = img1(Rect(220,120,340,240)); // (Rect(220,120,340,240)) 부분이 Mat 클래스의 괄호 연산자 재정의로 동작함
+//img1 영상의 (220,120) 좌표부터 340*240크기만큼의 사각형 부분 영상을 추출하는 코드.
+※주의사항
+Mat 클래스의 괄호 연산자를 이용해서 얻은 부분 영상은 얕은 복사(메모리 공간 공유)
+따라서 부분 영상의 픽셀값을 변경하면 원본영상도 같이 변경됨.
+
+img2 = ~img2; // 색상 성분에 대한 반전을 수행.
+
+독립된 메모리 영역에 부분 영상을 추출하고 싶다면 괄호 연산자 뒤에 Mat::clone()함수를 함께 사용해야 함.
+Mat img3 = img1(Rect(220, 120, 340, 240)).clone();
+
+
+void MatOp3()
+{
+	Mat img1 = imread("cat.bmp");
+
+	if (img1.empty()) {
+		cerr << "Image load failed!" << endl;
+		return;
+	}
+
+	Mat img2 = img1(Rect(220, 120, 340, 240));
+	Mat img3 = img1(Rect(220, 120, 340, 240)).clone();
+
+	img2 = ~img2;
+
+	imshow("img1", img1); // 원본 영상
+	imshow("img2", img2); // 메모리 공유 반전
+	imshow("img3", img3); // 메모리 구분 반전
+
+	waitKey();
+	destroyAllWindows();
+}
+
+Mat 행렬에서 특정 범위의 행 또는 열을 부분 행렬로 추출 -> Mat::rowRange() 또는 Mat::colRange() 함수를 사용
+지정하고자 하는 행 또는 열의 범위는 두개의 int값으로 지정하거나 Range 클래스 객체를 이용하여 지정할 수 있음
+
+Mat Mat::rowRange(int startrow, int endrow) const;
+Mat Mat::rowRange(const Range& r) const;
+startrow : 추출할 행 범위 시작번호(출력에 포함)
+endrow : 추출할 행 범위 끝 번호(출력에 미포함) //python의 range()범위와 동일
+r : 추출할 행 범위
+반환값 : 지정한 행 범위에 해당하는 행렬
+
+Mat Mat::colRange(int startcol, int endcol) const;
+Mat Mat::colRange(const Range& r) const;
+startcol : 추출할 열 범위 시작 번호(출력에 포함) 
+endcol : 추출할 열 범위 끝 번호(출력에 미포함)
+r : 추출할 열 범위
+반환값 : 지정한 열 범위에 해당하는 행렬
+
+Mat 행렬로부터 하나의 행 또는 열을 추출하여 1행짜리 or 1열짜리 행렬을 만들고자 할 때 
+Mat::row(), Mat::col()함수 사용 가능
+
+Mat Mat::row(int y) const;
+Mat Mat:col(int x) const;
+y : 부분 행렬로 추출할 행 번호
+x : 부분 행렬로 추출할 열 번호
+반환값 : 추출한 부분 행렬(얕은 복사)
