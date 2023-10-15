@@ -1,0 +1,79 @@
+행렬 정보 참조하기
+행렬 정보 구분
+1. Mat 클래스 멤버 변수에서 직접 참조로 얻기
+2. Mat 클래스 멤버 함수에서 행렬 정보 얻기
+
+Mat 객체 (행렬, 영상의 크기 정보..)  //Mat::rows : 행, Mat::cols : 열 -> public으로 선언되어 있음 => 외부에서도 자유롭게 접근
+
+lenna.bmp에서 가로, 세로 크기 출력하는 예시
+Mat img1 = imread("lenna.bmp");
+
+cout << "Width:" << img1.cols << endl; // 가로 크기
+cout << "Height:" << img1.rows << endl; // 세로 크기 
+/* Width:512 \n Height:512*/
+
+Mat 클래스의 Mat::data 변수 : 행렬 원소 데이터가 저장되어있는 메모리 공간의 시작 주소를 가리키는 포인터
+but 포인터 연산에 의한 에러 방지를 위해 Mat::at(), Mat::ptr() 등의 함수를 대신 사용
+
+Mat 클래스에서 행렬의 정보 확인을 위해 사용할 수 있는 멤버함수의 종류 ( const;는 생략)
+int Mat::channels() : 행렬의 채널수 
+int Mat::depth() : 행렬의 깊이 (CV_8U, CV_32F...)
+size_t Mat::elemSize() : 한 개의 원소가 차지하는 메모리 크기를 바이트 단위로 반환
+    (CV_32C3 타입 행렬 -> 4*3 = 12)
+size_t Mat::elemSize1() : 하나의 채널에서 한 개의 원소가 차지하는 메모리 크기를 바이트 단위로 반환
+    (CV_32SC3 타입 행렬 -> 4)
+bool Mat::empty() : 비어 있는 행렬이면 True 반환
+bool Mat::isContinuous() : 각 행의 원소가 연속적으로 저장되어 있으면 True 반환
+bool Mat::isSubmatrix() : 행렬이 다른 행렬의 부분 행렬이면 True 반환
+Size Mat::size() : 행렬 크기를 Size 타입으로 반환
+size_t Mat::total() : 전체 원소 개수 반환 
+int Mat::type() : 행렬의 타입을 반환 (CV_32FC1, CV_8UC3//3채널 컬러 영상, CV_8UC1//그레이스케일 영상)
+
+영상의 타입 확인 코드
+Mat img1 = imread("lenna.bmp");
+if(img1.type() == CV_8UC1)
+    cout << "img1 is a grayscale image." << endl;
+else if(img1.type() == CV_8UC3)
+    cout << "img1 is a truecolor image." << endl;
+
+Mat 클래스에 저장된 객체가 영상 -> imshow(). 
+but Mat 객체에 int, float, double 같은 자료형의 행렬이 저장되어 있는 경우에는 
+C++ 표준 출력 스트림 std::cout을 사용하여 Mat 객체에 저장된 행렬 원소 출력
+<< 연산자 재정의를 이용하여 행렬 원소를 출력하는 기능을 제공
+
+static inline
+std::ostream& operator << (std::ostream& out, const Mat& mtx)
+out : C++ 표준 출력 스트림 객체
+mtx : 출력할 행렬
+반환값 : C++ 표준 출력 스트림 객체의 참조
+
+<< 연산자 왼쪽에는 std::cout를 적고, << 연산자 오른쪽에는 Mat 객체 변수 이름
+=>해당 행렬 원소가 모두 콘솔창에 출력됨.
+
+예시 코드
+float data[] = {2.f, 1.414f, 3.f, 1.732f};
+Mat mat1(2, 2, CV_32FC1, data) // 2x2행렬로 표현
+
+std::cout << mat1 << std::endl;
+
+<< 연산자를 이용하면 [] 대괄호 안에 행려 원소가 행과 열을 구분하여 출력됨.
+다양한 크기의 영상 객체에 대해서도 << 연산자를 이용해 픽셀값을 출력 할 수 있음(콘솔창의 크기에 맞게 조절해야함)
+
+void MatOp5()
+{
+	Mat img1 = imread("lenna.bmp");
+	
+	cout << "Width: " << img1.cols << endl;
+	cout << "Height: " << img1.rows << endl;
+	cout << "Channels: " << img1.channels() << endl;
+
+	if (img1.type() == CV_8UC1)
+		cout << "img1 is a grayscale image." << endl;
+	else if (img1.type() == CV_8UC3)
+		cout << "img1 is a truecolor image." << endl;
+
+	float data[] = { 2.f, 1.414f, 3.f, 1.732f };
+	Mat mat1(2, 2, CV_32FC1, data);
+	cout << "mat1:\n" << mat1 << endl;
+
+}
