@@ -1,0 +1,40 @@
+<Scalar 클래스> : 4채널 이하의 영상에서 픽셀 값을 표현하는 용도로 자주 사용됨.
+Scalar_라는 이름의 클래스 템플릿 이름 재정의. / Vec 클래스를 상속받아 만들어졌음.
+
+template<typename _Tp> class Scalar_ : public Vec<_Tp, 4> //Vec 클래스를 상속받음.
+{
+    public :
+        Scalar_(); // Scalar_ 클래스 생성자
+        Scalar_(_Tp v0); // Scalar_ 클래스 생성자
+        Scalar_(_Tp v0, _Tp v1, _Tp v2=0, _Tp v3=0);
+
+        static Scalar_<_Tp> all(_Tp v0); // Scalar_::all() 멤버 함수는 네 개의 val 배열 값을 모두 v0으로 설정한 Scalar_ 객체를 반환
+        ...
+};
+
+tyepdef Scalar_<double> Scalar; // double 자료형을 사용하는 Scalar_ 클래스에 대해 Scalar라는 이름으로 재정의. // 크기가 4인 double형 배열 val을 멤버 변수로 가지고 있는 자료형.
+
+if 그레이스케일:
+Scalar 클래스의 첫번째 원소가 픽셀 밝기를 표현. 나머지 3개의 원소는 0으로 설정.
+if 트루컬러:
+Scalar 클래스의 처음 3개의 원소가 B, G, R 색상 성분값을 표현, 네번째 원소는 보통 0으로 설정.(png 형식처럼 투명도를 표현하는 알파 채널이 있는 경우에 네번째 원소를 사용하기도 함)
+//정리
+Scalar(밝기)
+Scalar(B, G, R)
+Scalar(B, G, R, 투명도)
+
+//Scalar 클래스 사용 예제 코드
+void ScalarOp()
+{
+    Scalar gray = 128; // 128 정수 하나를 사용하여 Scalar 클래스 타입의 변수 gray를 초기화. gray 객체의 val 멤버 변수에는 [128, 0, 0, 0]이 저장됨.
+    cout << "gray: " << gray << endl; //gray : [128, 0, 0, 0] 출력
+
+    Scalar yellow(0, 255, 255); // yellow 객체에는 노란색을 표현하는 [0, 255, 255, 0]이 저장됨(B, G, R, 투명도).
+    cout << "yellow: " << yellow << endl; //yellow : [0, 255, 255, 0] 출력
+
+    Mat img1(256,256,CV_8UC3, yellow); // yellow 변수를 Mat 클래스 생성자의 4번째 인자로 전달 -> 노란색으로 초기화된 256x256 크기의 컬러영상 img1 생성
+
+    for(int i = 0; i < 4 ; i++){ // yellow 객체에 저장된 값을 참조하기 위해 []연산자 재정의를 사용
+        cout << yellow[i] << endl; // 0 255 255 0 출력
+    }
+}

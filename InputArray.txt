@@ -1,0 +1,44 @@
+<InputArray 클래스> : OpenCV 함수의 입력으로 사용
+//imshow() 함수도 InputArray 타입으로 전달하도록 선언되어 있음.
+Mat, Vector<t> 등 다양한 타입을 포현할 수 있는 클래스를
+
+재정의 형태 :
+typedef const _InputArray& InputArray;
+_InputArray 클래스는 Mat, Mat_<T>, Matx<T, m, n>, vector<T>, vector< vector<T> >,
+vector<Mat>, vector<Mat_<T> >, UMat, vector<Mat>, double 같은 다양한 타입으로부터 생성될 수 있음
+
+_InputArray 클래스 : OpenCV 라이브러리 내부에서 코드 구현 편의상 사용.
+사용자가 명시적으로 클래스의 인스턴스 또는 변수를 생성하여 사용하는 것을 금지함.
+
+만약 특정 함수의 인자가 InputArray 타입을 받도록 되어있다면 
+Mat 클래스 객체 또는 vector<T> 타입의 변수를 전달하는 형태로 코드를 작성해야함.
+
+InputArray 타입의 함수 인자에 비어 있는 행렬을 전달하려면 함수 인자에 noArray() 또는 Mat()를 입력해야함.
+->사용자 정의 함수 인자에 InputArray 타입을 사용할 수 있음
+실제 함수에서는  _InputArray 클래스의 멤버 함수인 _InputArray::getMat()함수를 사용해서 Mat 객체 타입 형태로 변환해서 사용해야함.
+
+Mat _InputArray::getMat(int idx=-1) const;
+idx : 참조할 행 번호. idx < 0 이면 행렬 전체를 참조함
+반환값 : Mat 행렬 객체
+
+//실제 사용 예제 코드
+void InputArrayOp()
+{
+    // data1 배열 값을 원소로 갖는 2x3행렬 mat1 생성
+    uchar data1[] = {1, 2, 3, 4, 5, 6};
+    Mat mat1(2, 3, CV_8U, data1);
+
+    //printMat() 함수에 Mat 클래스 객체를 전달하여 원소 값을 출력
+    printMat(mat1);
+
+    vector<float> vec1 = {1.2f, 3.4f, -2.1f}; // 3개의 실수로 이루어진 vec1 벡터를 생성
+    printMat(vec1); // printMat() 함수에 vector<flat> 객체를 전달하여 원소 값 출력
+}
+//출력 결과 : [1, 2, 3; 4, 5, 6]  [1.2, 3.4000001, -2.0999999]
+
+void printMat(InputArray _mat) // Mat 행렬의 원소 값 출력.
+{
+    Mat mat = _mat.getMat(); // InputArray 타입의 _mat 객체로부터 Mat 객체 mat를 생성
+    cout << mat << endl; // C++ 표준 출력 스트림으로 mat 행렬을 출력
+}
+ 
